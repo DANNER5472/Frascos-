@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-gray-100 min-h-screen;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-6 py-3 rounded-2xl font-bold hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-purple-500/30 hover:shadow-purple-600/50 transform hover:-translate-y-1 hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-800 text-gray-100 px-6 py-3 rounded-2xl font-bold hover:bg-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg hover:shadow-xl hover:border-gray-600 transform hover:-translate-y-1;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-gray-700 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-800 text-gray-100 shadow-sm hover:border-gray-600 font-medium placeholder-gray-500;
+  }
+  
+  .card {
+    @apply bg-gray-800/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-700/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:bg-gray-800 hover:border-gray-600;
+  }
+  
+  .stat-card {
+    @apply bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 rounded-3xl shadow-2xl p-6 border-2 border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:scale-105 hover:border-gray-600;
+  }
+}
