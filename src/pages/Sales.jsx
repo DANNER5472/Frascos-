@@ -549,8 +549,7 @@ export default function Sales() {
                 onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
-                <RefreshCw className="w-5 h-5" />
-                Actualizar
+                
               </button>
             </div>
           </div>

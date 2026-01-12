@@ -82,9 +82,7 @@ export default function Layout({ children, currentPage, onNavigate, user, profil
                 <p style={{ fontSize: '14px', fontWeight: '800', color: '#f8fafc', margin: 0, letterSpacing: '0.3px' }}>
                   {profile?.full_name || user?.email?.split('@')[0] || 'Usuario'}
                 </p>
-                <p style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: '700', margin: '2px 0 0 0', textTransform: 'capitalize' }}>
-                  {profile?.role === 'admin' ? '👑 Admin' : '👤 Empleado'}
-                </p>
+              
               </div>
               <div style={{
                 width: '48px',

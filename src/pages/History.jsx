@@ -310,37 +310,7 @@ export default function History() {
           </div>
         </div>
 
-        {/* Botón actualizar */}
-        <button
-          onClick={loadTransactions}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            padding: '1rem',
-            borderRadius: '1rem',
-            background: 'rgba(31, 41, 55, 0.9)',
-            color: '#c4b5fd',
-            border: '2px solid rgba(139, 92, 246, 0.3)',
-            cursor: 'pointer',
-            fontWeight: '700',
-            fontSize: '1rem',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(139, 92, 246, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(31, 41, 55, 0.9)';
-            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)';
-          }}
-        >
-          <RefreshCw className="w-5 h-5" />
-          <span>Actualizar Historial</span>
-        </button>
+      
 
         {/* Lista de transacciones */}
         {loading ? (
