@@ -144,12 +144,12 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
     return `Hace ${Math.abs(offset)} semanas`;
   };
 
-  // Generar opciones de meses
+  // Generar opciones de meses (mes actual + 11 meses futuros)
   const getMonthOptions = () => {
     const options = [];
     const now = new Date();
     for (let i = 0; i < 12; i++) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
       options.push(date);
     }
     return options;
