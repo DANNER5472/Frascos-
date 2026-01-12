@@ -6,7 +6,7 @@ import Toast from '../components/Toast';
 import ConfirmModal from '../components/ConfirmModal';
 import EditSaleModal from '../components/EditSaleModal';
 import SalesByDay from '../components/SalesByDay';
-import DateSearch from '../components/DateSearch';
+import ResponsiveFilters from '../components/ResponsiveFilters';
 import useToast from '../hooks/useToast';
 import { ShoppingCart, Plus, Trash2, Edit, RefreshCw, Calendar, AlertCircle, TrendingUp, Download } from 'lucide-react';
 
@@ -227,18 +227,11 @@ export default function Sales() {
   };
 
   const handleExportPDF = () => {
-    try {
-      if (filteredSales.length === 0) {
-        alert('No hay ventas para exportar');
-        return;
-      }
-      console.log('Exportando', filteredSales.length, 'ventas...');
-      exportSalesPDF(filteredSales);
-      console.log('PDF exportado exitosamente');
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-      alert('Error al exportar PDF: ' + error.message);
+    if (filteredSales.length === 0) {
+      alert('No hay ventas para exportar');
+      return;
     }
+    exportSalesPDF(filteredSales);
   };
 
   const inputStyle = {
@@ -457,101 +450,18 @@ export default function Sales() {
               Historial de Ventas
             </h3>
             
-            <div className="flex items-center gap-3">
-              <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                background: 'rgba(31, 41, 55, 0.8)',
-                padding: '0.25rem',
-                borderRadius: '0.75rem',
-                border: '1px solid #374151'
-              }}>
-                {[
-                  { value: 'all', label: 'Todas' },
-                  { value: 'today', label: 'Hoy' },
-                  { value: 'week', label: '7 días' },
-                  { value: 'month', label: '30 días' }
-                ].map(filter => (
-                  <button
-                    key={filter.value}
-                    onClick={() => {
-                      setDateFilter(filter.value);
-                      setSpecificDate(''); // Limpiar fecha específica
-                    }}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      background: dateFilter === filter.value ? '#10b981' : 'transparent',
-                      color: dateFilter === filter.value ? '#ffffff' : '#9ca3af',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-
-              <DateSearch 
-                onDateSelect={(date) => {
-                  setSpecificDate(date);
-                  setDateFilter('all');
-                }}
-                selectedDate={specificDate}
-                onClear={() => {
-                  setSpecificDate('');
-                  applyFilter(sales, dateFilter);
-                }}
-              />
-
-              <button
-                onClick={handleExportPDF}
-                disabled={filteredSales.length === 0}
-                style={{
-                  color: '#34d399',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontWeight: '500',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: filteredSales.length === 0 ? 'not-allowed' : 'pointer',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.5rem',
-                  transition: 'all 0.2s',
-                  opacity: filteredSales.length === 0 ? 0.5 : 1
-                }}
-                onMouseEnter={(e) => filteredSales.length > 0 && (e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)')}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <Download className="w-5 h-5" />
-                Exportar PDF
-              </button>
-
-              <button
-                onClick={() => { loadSales(); loadStock(); }}
-                style={{
-                  color: '#34d399',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontWeight: '500',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.5rem',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                
-              </button>
-            </div>
+            <ResponsiveFilters 
+              dateFilter={dateFilter}
+              setDateFilter={setDateFilter}
+              specificDate={specificDate}
+              setSpecificDate={setSpecificDate}
+              onExport={handleExportPDF}
+              onClearDate={() => {
+                setSpecificDate('');
+                applyFilter(sales, dateFilter);
+              }}
+              data={filteredSales}
+            />
           </div>
 
           {loadingList ? (
