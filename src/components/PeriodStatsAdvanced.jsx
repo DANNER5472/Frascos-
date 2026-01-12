@@ -13,19 +13,24 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
   // Cerrar selectores al hacer click afuera
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (showDayPicker || showMonthPicker) {
-        const target = e.target;
-        const isDateInput = target.tagName === 'INPUT' && target.type === 'date';
-        const isInsideSelector = target.closest('[data-selector]');
-        
-        if (!isDateInput && !isInsideSelector) {
-          setShowDayPicker(false);
-          setShowMonthPicker(false);
-        }
+      const target = e.target;
+      const isInsideSelector = target.closest('[data-selector]');
+      const isButton = target.closest('button');
+      
+      // Solo cerrar si no estás dentro del selector y no estás clickeando el botón
+      if (!isInsideSelector && !isButton) {
+        setShowDayPicker(false);
+        setShowMonthPicker(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    if (showDayPicker || showMonthPicker) {
+      // Pequeño delay para evitar que se cierre inmediatamente
+      setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 100);
+    }
+
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showDayPicker, showMonthPicker]);
 
@@ -181,7 +186,10 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
           }} />
           {showSelector ? (
             <button
-              onClick={onSelectPeriod}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectPeriod();
+              }}
               style={{
                 background: 'rgba(59, 130, 246, 0.1)',
                 border: '1px solid rgba(59, 130, 246, 0.3)',
@@ -366,6 +374,7 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
           {showDayPicker && (
             <div 
               data-selector
+              onClick={(e) => e.stopPropagation()}
               style={{
               position: 'absolute',
               top: isMobile ? '3.5rem' : '4rem',
@@ -469,6 +478,7 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
           {showMonthPicker && (
             <div 
               data-selector
+              onClick={(e) => e.stopPropagation()}
               style={{
               position: 'absolute',
               top: isMobile ? '3.5rem' : '4rem',
