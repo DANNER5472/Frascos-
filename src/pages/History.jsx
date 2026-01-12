@@ -68,7 +68,7 @@ export default function History() {
         ...e,
         type: 'expense',
         display: e.description,
-        searchText: `gasto ${e.description} ${e.notes || ''}`
+   
       }));
 
       const all = [
@@ -254,7 +254,7 @@ export default function History() {
                 { value: 'all', label: `Todas (${transactions.length})` },
                 { value: 'purchase', label: `📥 Compras (${transactions.filter(t => t.type === 'purchase').length})` },
                 { value: 'sale', label: `📤 Ventas (${transactions.filter(t => t.type === 'sale').length})` },
-                { value: 'expense', label: `💸 Gastos (${transactions.filter(t => t.type === 'expense').length})` }
+             
               ].map(f => (
                 <button
                   key={f.value}
