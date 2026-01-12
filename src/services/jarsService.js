@@ -6,13 +6,52 @@ import { supabase } from './supabase';
 
 export const getBusinessStats = async () => {
   try {
-    const { data, error } = await supabase
-      .from('business_stats')
-      .select('*')
-      .single();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('Usuario no autenticado');
+    }
 
-    if (error) throw error;
-    return { success: true, data };
+    // Obtener todas las compras del usuario
+    const { data: purchases, error: purchasesError } = await supabase
+      .from('purchases')
+      .select('quantity, total_price')
+      .eq('user_id', user.id);
+
+    if (purchasesError) throw purchasesError;
+
+    // Obtener todas las ventas del usuario
+    const { data: sales, error: salesError } = await supabase
+      .from('jar_sales')
+      .select('quantity, unit_price')
+      .eq('user_id', user.id);
+
+    if (salesError) throw salesError;
+
+    // Calcular totales de compras
+    const totalPurchased = purchases.reduce((sum, p) => sum + parseInt(p.quantity || 0), 0);
+    const totalPurchasesCost = purchases.reduce((sum, p) => sum + parseFloat(p.total_price || 0), 0);
+
+    // Calcular totales de ventas
+    const totalSold = sales.reduce((sum, s) => sum + parseInt(s.quantity || 0), 0);
+    const totalSalesRevenue = sales.reduce((sum, s) => sum + (parseInt(s.quantity || 0) * parseFloat(s.unit_price || 0)), 0);
+
+    // Calcular stock actual
+    const currentStock = totalPurchased - totalSold;
+
+    // Calcular ganancia neta
+    const netProfit = totalSalesRevenue - totalPurchasesCost;
+
+    const stats = {
+      current_stock: currentStock,
+      total_purchased: totalPurchased,
+      total_jars_sold: totalSold,
+      total_purchases: totalPurchasesCost,
+      total_sales: totalSalesRevenue,
+      net_profit: netProfit
+    };
+
+    return { success: true, data: stats };
   } catch (error) {
     console.error('Error fetching stats:', error);
     return { success: false, error: error.message };
