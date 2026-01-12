@@ -109,10 +109,7 @@ export default function Login({ onSuccess }) {
 
           <div className="mt-6 text-center text-sm text-gray-600">
 
-            <p className="text-xs bg-gray-50 p-2 rounded">
-              Email: admin@test.com<br />
-              Password: 123456
-            </p>
+            
           </div>
         </div>
 
