@@ -64,7 +64,7 @@ export default function Dashboard() {
         color: '#f3f4f6'
       }}>
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-blue-400 animate-spin mx-auto mb-4" />
+          <Package className="w-12 h-12 text-blue-400 mx-auto mb-4" style={{ animation: 'pulse 2s infinite' }} />
           <p style={{ color: '#d1d5db', fontWeight: '600' }}>Cargando estadísticas...</p>
         </div>
       </div>
