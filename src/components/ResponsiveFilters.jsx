@@ -1,4 +1,4 @@
-import { Download, RefreshCw, Calendar } from 'lucide-react';
+import { Download } from 'lucide-react';
 import DateSearch from './DateSearch';
 
 export default function ResponsiveFilters({ 
@@ -6,11 +6,9 @@ export default function ResponsiveFilters({
   setDateFilter, 
   specificDate, 
   setSpecificDate,
-  onRefresh,
   onExport,
   onClearDate,
-  data,
-  loading
+  data
 }) {
   const isMobile = window.innerWidth < 768;
 
@@ -22,19 +20,19 @@ export default function ResponsiveFilters({
   ];
 
   if (isMobile) {
-    // VISTA MÓVIL - Diseño compacto sin botón actualizar
     return (
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.4rem',
-        marginBottom: '0.75rem'
+        gap: '0.5rem',
+        marginBottom: '1rem',
+        padding: '0 0.5rem'
       }}>
-        {/* Fila 1: Filtros de tiempo */}
+        {/* Filtros */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '0.2rem'
+          gap: '0.3rem'
         }}>
           {filters.map(filter => (
             <button
@@ -44,8 +42,8 @@ export default function ResponsiveFilters({
                 setSpecificDate('');
               }}
               style={{
-                padding: '0.4rem 0.2rem',
-                borderRadius: '0.4rem',
+                padding: '0.5rem 0.25rem',
+                borderRadius: '0.5rem',
                 fontSize: '0.7rem',
                 fontWeight: '600',
                 background: dateFilter === filter.value 
@@ -54,10 +52,7 @@ export default function ResponsiveFilters({
                 color: dateFilter === filter.value ? '#ffffff' : '#9ca3af',
                 border: dateFilter === filter.value ? 'none' : '1px solid rgba(148, 163, 184, 0.2)',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: dateFilter === filter.value 
-                  ? '0 2px 6px rgba(59, 130, 246, 0.3)'
-                  : 'none'
+                transition: 'all 0.2s'
               }}
             >
               {filter.label}
@@ -65,25 +60,22 @@ export default function ResponsiveFilters({
           ))}
         </div>
 
-        {/* Fila 2: Calendario + PDF (SIN actualizar) */}
+        {/* Calendario y PDF */}
         <div style={{
-          display: 'flex',
-          gap: '0.3rem',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          gap: '0.5rem',
           alignItems: 'center'
         }}>
-          {/* Calendario */}
-          <div style={{ flex: '1', minWidth: '0' }}>
-            <DateSearch 
-              onDateSelect={(date) => {
-                setSpecificDate(date);
-                setDateFilter('all');
-              }}
-              selectedDate={specificDate}
-              onClear={onClearDate}
-            />
-          </div>
+          <DateSearch 
+            onDateSelect={(date) => {
+              setSpecificDate(date);
+              setDateFilter('all');
+            }}
+            selectedDate={specificDate}
+            onClear={onClearDate}
+          />
 
-          {/* Solo botón PDF */}
           <button
             onClick={onExport}
             disabled={data.length === 0}
@@ -92,22 +84,19 @@ export default function ResponsiveFilters({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.3rem',
-              padding: '0.45rem 0.6rem',
-              borderRadius: '0.4rem',
+              padding: '0.5rem 0.75rem',
+              borderRadius: '0.5rem',
               border: 'none',
               background: data.length === 0 
                 ? 'rgba(31, 41, 55, 0.5)'
                 : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: '#ffffff',
               cursor: data.length === 0 ? 'not-allowed' : 'pointer',
-              opacity: data.length === 0 ? 0.5 : 1,
-              boxShadow: data.length > 0 ? '0 2px 6px rgba(16, 185, 129, 0.3)' : 'none',
               fontSize: '0.7rem',
               fontWeight: '600',
               whiteSpace: 'nowrap',
-              flexShrink: 0
+              height: '38px'
             }}
-            title="Exportar PDF"
           >
             <Download style={{ width: '14px', height: '14px' }} />
             PDF
@@ -117,7 +106,7 @@ export default function ResponsiveFilters({
     );
   }
 
-  // VISTA DESKTOP - Diseño horizontal
+  // DESKTOP
   return (
     <div style={{
       display: 'flex',
@@ -126,7 +115,6 @@ export default function ResponsiveFilters({
       marginBottom: '1.5rem',
       flexWrap: 'wrap'
     }}>
-      {/* Filtros de tiempo */}
       <div style={{
         display: 'flex',
         gap: '0.5rem',
@@ -159,7 +147,6 @@ export default function ResponsiveFilters({
         ))}
       </div>
 
-      {/* Calendario */}
       <DateSearch 
         onDateSelect={(date) => {
           setSpecificDate(date);
@@ -168,30 +155,6 @@ export default function ResponsiveFilters({
         selectedDate={specificDate}
         onClear={onClearDate}
       />
-
-      {/* Botones de acción */}
-      <button
-        onClick={onRefresh}
-        disabled={loading}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.75rem 1.25rem',
-          borderRadius: '0.75rem',
-          border: '2px solid rgba(59, 130, 246, 0.3)',
-          background: 'rgba(31, 41, 55, 0.8)',
-          color: '#60a5fa',
-          fontSize: '0.875rem',
-          fontWeight: '600',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          opacity: loading ? 0.5 : 1
-        }}
-      >
-        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        {loading ? 'Actualizando...' : 'Actualizar'}
-      </button>
 
       <button
         onClick={onExport}
@@ -208,9 +171,7 @@ export default function ResponsiveFilters({
           fontSize: '0.875rem',
           fontWeight: '600',
           cursor: data.length === 0 ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          opacity: data.length === 0 ? 0.5 : 1,
-          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+          opacity: data.length === 0 ? 0.5 : 1
         }}
       >
         <Download className="w-4 h-4" />
