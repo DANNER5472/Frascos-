@@ -22,19 +22,19 @@ export default function ResponsiveFilters({
   ];
 
   if (isMobile) {
-    // VISTA MÓVIL - Diseño vertical compacto
+    // VISTA MÓVIL - Diseño compacto máximo
     return (
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.5rem',
-        marginBottom: '1rem'
+        gap: '0.4rem',
+        marginBottom: '0.75rem'
       }}>
-        {/* Fila 1: Filtros de tiempo - MÁS COMPACTOS */}
+        {/* Fila 1: Filtros de tiempo - MUY COMPACTOS */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '0.25rem'
+          gap: '0.2rem'
         }}>
           {filters.map(filter => (
             <button
@@ -44,9 +44,9 @@ export default function ResponsiveFilters({
                 setSpecificDate('');
               }}
               style={{
-                padding: '0.5rem 0.25rem',
-                borderRadius: '0.5rem',
-                fontSize: '0.75rem',
+                padding: '0.4rem 0.2rem',
+                borderRadius: '0.4rem',
+                fontSize: '0.7rem',
                 fontWeight: '600',
                 background: dateFilter === filter.value 
                   ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
@@ -56,7 +56,7 @@ export default function ResponsiveFilters({
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 boxShadow: dateFilter === filter.value 
-                  ? '0 2px 8px rgba(59, 130, 246, 0.3)'
+                  ? '0 2px 6px rgba(59, 130, 246, 0.3)'
                   : 'none'
               }}
             >
@@ -65,10 +65,10 @@ export default function ResponsiveFilters({
           ))}
         </div>
 
-        {/* Fila 2: Calendario + Botones de acción - TODO EN UNA LÍNEA */}
+        {/* Fila 2: Calendario + Botones - TODO EN UNA LÍNEA MÁS COMPACTA */}
         <div style={{
           display: 'flex',
-          gap: '0.25rem',
+          gap: '0.2rem',
           alignItems: 'center'
         }}>
           {/* Calendario compacto */}
@@ -91,18 +91,19 @@ export default function ResponsiveFilters({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0.5rem',
-              borderRadius: '0.5rem',
+              padding: '0.45rem',
+              borderRadius: '0.4rem',
               border: '1px solid rgba(148, 163, 184, 0.2)',
               background: 'rgba(31, 41, 55, 0.8)',
               color: '#60a5fa',
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.5 : 1,
-              minWidth: '40px'
+              minWidth: '36px',
+              height: '36px'
             }}
             title="Actualizar"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} style={{ width: '14px', height: '14px' }} />
           </button>
 
           <button
@@ -112,8 +113,8 @@ export default function ResponsiveFilters({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0.5rem',
-              borderRadius: '0.5rem',
+              padding: '0.45rem',
+              borderRadius: '0.4rem',
               border: 'none',
               background: data.length === 0 
                 ? 'rgba(31, 41, 55, 0.5)'
@@ -121,12 +122,13 @@ export default function ResponsiveFilters({
               color: '#ffffff',
               cursor: data.length === 0 ? 'not-allowed' : 'pointer',
               opacity: data.length === 0 ? 0.5 : 1,
-              boxShadow: data.length > 0 ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 'none',
-              minWidth: '40px'
+              boxShadow: data.length > 0 ? '0 2px 6px rgba(16, 185, 129, 0.3)' : 'none',
+              minWidth: '36px',
+              height: '36px'
             }}
             title="Exportar PDF"
           >
-            <Download className="w-4 h-4" />
+            <Download style={{ width: '14px', height: '14px' }} />
           </button>
         </div>
       </div>

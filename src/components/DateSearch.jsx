@@ -5,14 +5,15 @@ export default function DateSearch({ onDateSelect, selectedDate, onClear }) {
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '0.25rem',
-      padding: '0.5rem 0.75rem',
+      gap: '0.2rem',
+      padding: '0.4rem 0.6rem',
       background: 'rgba(59, 130, 246, 0.1)',
       border: '1px solid rgba(59, 130, 246, 0.3)',
-      borderRadius: '0.5rem',
-      width: '100%'
+      borderRadius: '0.4rem',
+      width: '100%',
+      height: '36px'
     }}>
-      <Calendar className="w-4 h-4" style={{ color: '#60a5fa', flexShrink: 0 }} />
+      <Calendar style={{ width: '14px', height: '14px', color: '#60a5fa', flexShrink: 0 }} />
       
       <input
         type="date"
@@ -22,7 +23,7 @@ export default function DateSearch({ onDateSelect, selectedDate, onClear }) {
           background: 'transparent',
           border: 'none',
           color: '#f3f4f6',
-          fontSize: '0.75rem',
+          fontSize: '0.7rem',
           fontWeight: '500',
           outline: 'none',
           cursor: 'pointer',
@@ -38,8 +39,8 @@ export default function DateSearch({ onDateSelect, selectedDate, onClear }) {
             background: 'rgba(239, 68, 68, 0.2)',
             border: 'none',
             color: '#f87171',
-            padding: '0.25rem',
-            borderRadius: '0.25rem',
+            padding: '0.2rem',
+            borderRadius: '0.2rem',
             cursor: 'pointer',
             transition: 'all 0.2s',
             display: 'flex',
@@ -51,7 +52,7 @@ export default function DateSearch({ onDateSelect, selectedDate, onClear }) {
           onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
           title="Limpiar"
         >
-          <X className="w-3 h-3" />
+          <X style={{ width: '12px', height: '12px' }} />
         </button>
       )}
     </div>
