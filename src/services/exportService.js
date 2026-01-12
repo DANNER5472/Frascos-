@@ -11,7 +11,7 @@ const addHeader = (doc, title, subtitle = '') => {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text('Reporte del Negocio', 20, 15);
+  doc.text('Business Manager', 20, 15);
   
   doc.setFontSize(14);
   doc.setFont('helvetica', 'normal');
@@ -250,7 +250,7 @@ export const exportStatsPDF = async (stats, purchases = [], sales = []) => {
   
   const startY = addHeader(
     doc,
-    
+    'Reporte del Negocio',
     `Generado el ${new Date().toLocaleDateString('es-ES')}`
   );
   
@@ -301,4 +301,190 @@ export const exportStatsPDF = async (stats, purchases = [], sales = []) => {
   }
   
   doc.save(`reporte-completo_${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
+// ============================================
+// EXPORTAR PERÍODO ESPECÍFICO
+// ============================================
+
+export const exportPeriodPDF = (periodType, data, periodLabel) => {
+  const doc = new jsPDF();
+  
+  const { sales = [], purchases = [] } = data;
+  
+  const title = periodType === 'day' ? 'Reporte Diario' : 
+                periodType === 'week' ? 'Reporte Semanal' :
+                'Reporte Mensual';
+  
+  const startY = addHeader(
+    doc,
+    title,
+    periodLabel
+  );
+  
+  let currentY = startY + 5;
+  
+  // RESUMEN
+  doc.setFillColor(59, 130, 246);
+  doc.rect(20, currentY, doc.internal.pageSize.width - 40, 8, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('RESUMEN DEL PERÍODO', 25, currentY + 6);
+  
+  currentY += 13;
+  
+  // Totales de ventas
+  const totalSalesQty = sales.reduce((sum, s) => sum + parseInt(s.quantity || 0), 0);
+  const totalSalesAmount = sales.reduce((sum, s) => sum + (parseInt(s.quantity || 0) * parseFloat(s.unit_price || 0)), 0);
+  
+  // Totales de compras
+  const totalPurchasesQty = purchases.reduce((sum, p) => sum + parseInt(p.quantity || 0), 0);
+  const totalPurchasesAmount = purchases.reduce((sum, p) => sum + parseFloat(p.total_price || 0), 0);
+  
+  doc.setTextColor(31, 41, 55);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('VENTAS:', 25, currentY);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${totalSalesQty} frascos - Bs. ${totalSalesAmount.toFixed(2)}`, 25, currentY + 5);
+  
+  currentY += 10;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('COMPRAS:', 25, currentY);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${totalPurchasesQty} frascos - Bs. ${totalPurchasesAmount.toFixed(2)}`, 25, currentY + 5);
+  
+  currentY += 10;
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('BALANCE:', 25, currentY);
+  doc.setFont('helvetica', 'normal');
+  const balance = totalSalesAmount - totalPurchasesAmount;
+  doc.setTextColor(balance >= 0 ? 16 : 239, balance >= 0 ? 185 : 68, balance >= 0 ? 129 : 68);
+  doc.text(`Bs. ${balance.toFixed(2)}`, 25, currentY + 5);
+  
+  currentY += 15;
+  
+  // DETALLE DE VENTAS
+  if (sales.length > 0) {
+    doc.setFillColor(16, 185, 129);
+    doc.rect(20, currentY, doc.internal.pageSize.width - 40, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`VENTAS (${sales.length})`, 25, currentY + 6);
+    
+    currentY += 13;
+    
+    // Encabezados
+    doc.setFontSize(8);
+    doc.setTextColor(16, 185, 129);
+    doc.text('Fecha', 25, currentY);
+    doc.text('Cant.', 75, currentY);
+    doc.text('Precio Unit.', 110, currentY);
+    doc.text('Total', 155, currentY);
+    currentY += 4;
+    doc.setDrawColor(16, 185, 129);
+    doc.line(20, currentY, 190, currentY);
+    currentY += 5;
+    
+    // Datos
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'normal');
+    
+    sales.forEach((sale) => {
+      if (currentY > 270) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      const date = new Date(sale.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      const quantity = sale.quantity;
+      const unitPrice = parseFloat(sale.unit_price).toFixed(2);
+      const total = (quantity * parseFloat(sale.unit_price)).toFixed(2);
+      
+      doc.text(date, 25, currentY);
+      doc.text(quantity.toString(), 75, currentY);
+      doc.text(`Bs. ${unitPrice}`, 110, currentY);
+      doc.text(`Bs. ${total}`, 155, currentY);
+      
+      currentY += 5;
+    });
+    
+    currentY += 5;
+  }
+  
+  // DETALLE DE COMPRAS
+  if (purchases.length > 0) {
+    if (currentY > 200) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFillColor(59, 130, 246);
+    doc.rect(20, currentY, doc.internal.pageSize.width - 40, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`COMPRAS (${purchases.length})`, 25, currentY + 6);
+    
+    currentY += 13;
+    
+    // Encabezados
+    doc.setFontSize(8);
+    doc.setTextColor(59, 130, 246);
+    doc.text('Fecha', 25, currentY);
+    doc.text('Cant.', 75, currentY);
+    doc.text('Costo Unit.', 110, currentY);
+    doc.text('Total', 155, currentY);
+    currentY += 4;
+    doc.setDrawColor(59, 130, 246);
+    doc.line(20, currentY, 190, currentY);
+    currentY += 5;
+    
+    // Datos
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'normal');
+    
+    purchases.forEach((purchase) => {
+      if (currentY > 270) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      const date = new Date(purchase.created_at).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      const quantity = purchase.quantity;
+      const unitCost = (parseFloat(purchase.total_price) / quantity).toFixed(2);
+      const total = parseFloat(purchase.total_price).toFixed(2);
+      
+      doc.text(date, 25, currentY);
+      doc.text(quantity.toString(), 75, currentY);
+      doc.text(`Bs. ${unitCost}`, 110, currentY);
+      doc.text(`Bs. ${total}`, 155, currentY);
+      
+      currentY += 5;
+    });
+  }
+  
+  // Footer en todas las páginas
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    addFooter(doc, i, totalPages);
+  }
+  
+  const filename = `reporte-${periodType}-${periodLabel.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+  doc.save(filename);
 };

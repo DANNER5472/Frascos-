@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { getBusinessStats, getPurchases, getSales } from '../services/jarsService';
-import { exportStatsPDF } from '../services/exportService';
-import PeriodStats from '../components/PeriodStats';
+import { exportStatsPDF, exportPeriodPDF } from '../services/exportService';
+import PeriodStatsAdvanced from '../components/PeriodStatsAdvanced';
 import { 
   Package, 
   AlertTriangle,
@@ -173,7 +173,13 @@ export default function Dashboard() {
         )}
 
         {/* Estadísticas por Período */}
-        <PeriodStats sales={sales} purchases={purchases} />
+        <PeriodStatsAdvanced 
+          sales={sales} 
+          purchases={purchases}
+          onExportPDF={(periodType, data, periodLabel) => {
+            exportPeriodPDF(periodType, data, periodLabel);
+          }}
+        />
 
         {/* Card de Inventario */}
         <div style={{
