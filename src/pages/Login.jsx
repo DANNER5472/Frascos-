@@ -69,7 +69,7 @@ export default function Login({ onSuccess }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
-                placeholder="admin@test.com"
+                placeholder="••••••••"
                 disabled={loading}
               />
             </div>
