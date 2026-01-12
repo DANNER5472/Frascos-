@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExportPDF }) {
@@ -9,6 +9,25 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
   const [showMonthPicker, setShowMonthPicker] = useState(false);
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // Cerrar selectores al hacer click afuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showDayPicker || showMonthPicker) {
+        const target = e.target;
+        const isDateInput = target.tagName === 'INPUT' && target.type === 'date';
+        const isInsideSelector = target.closest('[data-selector]');
+        
+        if (!isDateInput && !isInsideSelector) {
+          setShowDayPicker(false);
+          setShowMonthPicker(false);
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showDayPicker, showMonthPicker]);
 
   // Calcular estadísticas para un día específico
   const calculateDayStats = (date) => {
@@ -333,21 +352,53 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
         gap: isMobile ? '0.75rem' : '1rem'
       }}>
         {/* DÍA */}
-        <StatCard
-          title="Día"
-          stats={dayStats}
-          periodLabel={formatDate(selectedDay)}
-          showSelector={true}
-          onSelectPeriod={() => {
-            const input = document.createElement('input');
-            input.type = 'date';
-            input.value = selectedDay.toISOString().split('T')[0];
-            input.onchange = (e) => setSelectedDay(new Date(e.target.value));
-            input.click();
-          }}
-          onExport={(data) => onExportPDF('day', data, formatDate(selectedDay))}
-          color="#10b981"
-        />
+        <div style={{ position: 'relative' }}>
+          <StatCard
+            title="Día"
+            stats={dayStats}
+            periodLabel={formatDate(selectedDay)}
+            showSelector={true}
+            onSelectPeriod={() => setShowDayPicker(!showDayPicker)}
+            onExport={(data) => onExportPDF('day', data, formatDate(selectedDay))}
+            color="#10b981"
+          />
+          {/* Selector de día */}
+          {showDayPicker && (
+            <div 
+              data-selector
+              style={{
+              position: 'absolute',
+              top: isMobile ? '3.5rem' : '4rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1000,
+              background: 'rgba(30, 41, 59, 0.98)',
+              border: '2px solid rgba(16, 185, 129, 0.5)',
+              borderRadius: '0.75rem',
+              padding: '1rem',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+            }}>
+              <input
+                type="date"
+                value={selectedDay.toISOString().split('T')[0]}
+                onChange={(e) => {
+                  setSelectedDay(new Date(e.target.value + 'T12:00:00'));
+                  setShowDayPicker(false);
+                }}
+                style={{
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  color: '#fff',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer'
+                }}
+                autoFocus
+              />
+            </div>
+          )}
+        </div>
 
         {/* SEMANA */}
         <div style={{ position: 'relative' }}>
@@ -404,32 +455,73 @@ export default function PeriodStatsAdvanced({ sales = [], purchases = [], onExpo
         </div>
 
         {/* MES */}
-        <StatCard
-          title="Mes"
-          stats={monthStats}
-          periodLabel={formatMonth(selectedMonth)}
-          showSelector={true}
-          onSelectPeriod={() => {
-            const select = document.createElement('select');
-            select.style.position = 'absolute';
-            select.style.opacity = '0';
-            getMonthOptions().forEach((date, index) => {
-              const option = document.createElement('option');
-              option.value = index;
-              option.text = formatMonth(date);
-              select.appendChild(option);
-            });
-            select.onchange = (e) => {
-              const monthOptions = getMonthOptions();
-              setSelectedMonth(monthOptions[e.target.value]);
-              document.body.removeChild(select);
-            };
-            document.body.appendChild(select);
-            select.click();
-          }}
-          onExport={(data) => onExportPDF('month', data, formatMonth(selectedMonth))}
-          color="#8b5cf6"
-        />
+        <div style={{ position: 'relative' }}>
+          <StatCard
+            title="Mes"
+            stats={monthStats}
+            periodLabel={formatMonth(selectedMonth)}
+            showSelector={true}
+            onSelectPeriod={() => setShowMonthPicker(!showMonthPicker)}
+            onExport={(data) => onExportPDF('month', data, formatMonth(selectedMonth))}
+            color="#8b5cf6"
+          />
+          {/* Selector de mes */}
+          {showMonthPicker && (
+            <div 
+              data-selector
+              style={{
+              position: 'absolute',
+              top: isMobile ? '3.5rem' : '4rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1000,
+              background: 'rgba(30, 41, 59, 0.98)',
+              border: '2px solid rgba(139, 92, 246, 0.5)',
+              borderRadius: '0.75rem',
+              padding: '0.5rem',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              minWidth: '180px'
+            }}>
+              {getMonthOptions().map((date, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    setSelectedMonth(date);
+                    setShowMonthPicker(false);
+                  }}
+                  style={{
+                    padding: '0.6rem 0.8rem',
+                    cursor: 'pointer',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: '#fff',
+                    background: date.getMonth() === selectedMonth.getMonth() && 
+                               date.getFullYear() === selectedMonth.getFullYear() 
+                               ? 'rgba(139, 92, 246, 0.3)' 
+                               : 'transparent',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!(date.getMonth() === selectedMonth.getMonth() && 
+                          date.getFullYear() === selectedMonth.getFullYear())) {
+                      e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!(date.getMonth() === selectedMonth.getMonth() && 
+                          date.getFullYear() === selectedMonth.getFullYear())) {
+                      e.currentTarget.style.background = 'transparent';
+                    }
+                  }}
+                >
+                  {formatMonth(date)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
