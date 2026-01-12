@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { getBusinessStats, getPurchases, getSales } from '../services/jarsService';
 import { exportStatsPDF } from '../services/exportService';
+import PeriodStats from '../components/PeriodStats';
 import { 
   Package, 
   AlertTriangle,
@@ -13,11 +14,14 @@ import {
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
+  const [sales, setSales] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadUserProfile();
     loadStats();
+    loadTransactions();
   }, []);
 
   const loadUserProfile = async () => {
@@ -39,6 +43,16 @@ export default function Dashboard() {
       setStats(result.data);
     }
     setLoading(false);
+  };
+
+  const loadTransactions = async () => {
+    const [salesResult, purchasesResult] = await Promise.all([
+      getSales(1000),
+      getPurchases(1000)
+    ]);
+    
+    if (salesResult.success) setSales(salesResult.data || []);
+    if (purchasesResult.success) setPurchases(purchasesResult.data || []);
   };
 
   const handleExportPDF = async () => {
@@ -157,6 +171,9 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
+        {/* Estadísticas por Período */}
+        <PeriodStats sales={sales} purchases={purchases} />
 
         {/* Card de Inventario */}
         <div style={{
