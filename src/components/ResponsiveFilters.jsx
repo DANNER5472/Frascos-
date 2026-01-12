@@ -22,7 +22,7 @@ export default function ResponsiveFilters({
   ];
 
   if (isMobile) {
-    // VISTA MÓVIL - Diseño compacto máximo
+    // VISTA MÓVIL - Diseño compacto sin botón actualizar
     return (
       <div style={{
         display: 'flex',
@@ -30,7 +30,7 @@ export default function ResponsiveFilters({
         gap: '0.4rem',
         marginBottom: '0.75rem'
       }}>
-        {/* Fila 1: Filtros de tiempo - MUY COMPACTOS */}
+        {/* Fila 1: Filtros de tiempo */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -65,13 +65,13 @@ export default function ResponsiveFilters({
           ))}
         </div>
 
-        {/* Fila 2: Calendario + Botones - TODO EN UNA LÍNEA MÁS COMPACTA */}
+        {/* Fila 2: Calendario + PDF (SIN actualizar) */}
         <div style={{
           display: 'flex',
-          gap: '0.2rem',
+          gap: '0.3rem',
           alignItems: 'center'
         }}>
-          {/* Calendario compacto */}
+          {/* Calendario */}
           <div style={{ flex: '1', minWidth: '0' }}>
             <DateSearch 
               onDateSelect={(date) => {
@@ -83,29 +83,7 @@ export default function ResponsiveFilters({
             />
           </div>
 
-          {/* Botones más pequeños */}
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0.45rem',
-              borderRadius: '0.4rem',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
-              background: 'rgba(31, 41, 55, 0.8)',
-              color: '#60a5fa',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.5 : 1,
-              minWidth: '36px',
-              height: '36px'
-            }}
-            title="Actualizar"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} style={{ width: '14px', height: '14px' }} />
-          </button>
-
+          {/* Solo botón PDF */}
           <button
             onClick={onExport}
             disabled={data.length === 0}
@@ -113,7 +91,8 @@ export default function ResponsiveFilters({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0.45rem',
+              gap: '0.3rem',
+              padding: '0.45rem 0.6rem',
               borderRadius: '0.4rem',
               border: 'none',
               background: data.length === 0 
@@ -123,12 +102,15 @@ export default function ResponsiveFilters({
               cursor: data.length === 0 ? 'not-allowed' : 'pointer',
               opacity: data.length === 0 ? 0.5 : 1,
               boxShadow: data.length > 0 ? '0 2px 6px rgba(16, 185, 129, 0.3)' : 'none',
-              minWidth: '36px',
-              height: '36px'
+              fontSize: '0.7rem',
+              fontWeight: '600',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
             title="Exportar PDF"
           >
             <Download style={{ width: '14px', height: '14px' }} />
+            PDF
           </button>
         </div>
       </div>
