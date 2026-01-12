@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { getBusinessStats, getPurchases, getSales } from '../services/jarsService';
-import { exportStatsPDF, exportPeriodPDF } from '../services/exportService';
+import { exportPeriodPDF } from '../services/exportService';
 import PeriodStatsAdvanced from '../components/PeriodStatsAdvanced';
 import { 
   Package, 
   AlertTriangle,
-  RefreshCw,
-  Sparkles,
-  Download
+  Sparkles
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -53,30 +51,6 @@ export default function Dashboard() {
     
     if (salesResult.success) setSales(salesResult.data || []);
     if (purchasesResult.success) setPurchases(purchasesResult.data || []);
-  };
-
-  const handleExportPDF = async () => {
-    if (!stats) return;
-    
-    const [purchasesResult, salesResult] = await Promise.all([
-      getPurchases(1000),
-      getSales(1000)
-    ]);
-    
-    const purchasesData = purchasesResult.success ? purchasesResult.data : [];
-    const salesData = salesResult.success ? salesResult.data : [];
-    
-    // Calcular total_purchased y total_sold
-    const totalPurchased = stats.current_stock + (stats.total_jars_sold || 0);
-    const totalSold = stats.total_jars_sold || 0;
-    
-    const exportData = {
-      ...stats,
-      total_purchased: totalPurchased,
-      total_sold: totalSold
-    };
-    
-    exportStatsPDF(exportData, purchasesData, salesData);
   };
 
   if (loading) {
@@ -172,16 +146,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Estadísticas por Período */}
-        <PeriodStatsAdvanced 
-          sales={sales} 
-          purchases={purchases}
-          onExportPDF={(periodType, data, periodLabel) => {
-            exportPeriodPDF(periodType, data, periodLabel);
-          }}
-        />
-
-        {/* Card de Inventario */}
+        {/* 1. INVENTARIO ACTUAL - PRIMERO */}
         <div style={{
           background: 'rgba(31, 41, 55, 0.9)',
           backdropFilter: 'blur(10px)',
@@ -198,47 +163,78 @@ export default function Dashboard() {
             }}>
               <Package className="w-8 h-8 text-purple-400" />
             </div>
-            <h3 style={{
-              fontSize: '1.75rem',
+            <div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(to right, #a78bfa, #8b5cf6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                📦 Inventario Actual
+              </h3>
+            </div>
+          </div>
+
+          {/* Stock Actual */}
+          <div style={{
+            padding: '1.5rem',
+            borderRadius: '1rem',
+            background: 'rgba(139, 92, 246, 0.1)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+            textAlign: 'center'
+          }}>
+            <div style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+              Frascos en Stock
+            </div>
+            <div style={{
+              fontSize: '3rem',
               fontWeight: 'bold',
-              color: '#f9fafb',
-              margin: 0
+              color: currentStock === 0 ? '#ef4444' : currentStock < 20 ? '#f59e0b' : '#8b5cf6'
             }}>
-              📦 Inventario
+              {currentStock}
+            </div>
+          </div>
+        </div>
+
+        {/* 2. ESTADÍSTICAS POR PERÍODO - SEGUNDO */}
+        <PeriodStatsAdvanced 
+          sales={sales} 
+          purchases={purchases}
+          onExportPDF={(periodType, data, periodLabel) => {
+            exportPeriodPDF(periodType, data, periodLabel);
+          }}
+        />
+
+        {/* 3. TOTALES HISTÓRICOS - TERCERO */}
+        <div style={{
+          background: 'rgba(31, 41, 55, 0.9)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '1.5rem',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+          padding: '2rem',
+          border: '2px solid rgba(59, 130, 246, 0.3)'
+        }}>
+          <div className="flex items-center gap-3 mb-6">
+            <div style={{
+              padding: '1rem',
+              borderRadius: '1rem',
+              background: 'rgba(59, 130, 246, 0.2)'
+            }}>
+              <Package className="w-8 h-8 text-blue-400" />
+            </div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              💰 Totales Históricos
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Stock Actual */}
-            <div style={{
-              background: 'rgba(139, 92, 246, 0.1)',
-              border: '2px solid rgba(139, 92, 246, 0.3)',
-              borderRadius: '1rem',
-              padding: '1.5rem',
-              textAlign: 'center'
-            }}>
-              <p style={{ 
-                fontSize: '0.875rem', 
-                color: '#d1d5db', 
-                fontWeight: '500', 
-                marginBottom: '0.75rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}>
-                Stock Actual
-              </p>
-              <p style={{ 
-                fontSize: '3rem', 
-                fontWeight: 'bold', 
-                color: isLowStock ? '#fb923c' : currentStock === 0 ? '#ef4444' : '#a78bfa',
-                marginBottom: '0.5rem',
-                lineHeight: 1
-              }}>
-                {currentStock}
-              </p>
-              <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>frascos disponibles</p>
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Total Comprado */}
             <div style={{
               background: 'rgba(59, 130, 246, 0.1)',
@@ -299,58 +295,6 @@ export default function Dashboard() {
               <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>frascos vendidos</p>
             </div>
           </div>
-        </div>
-
-        {/* Botones de Acción */}
-        <div className="flex flex-wrap gap-4 justify-center">
-          <button
-            onClick={loadStats}
-            disabled={loading}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '1rem 2rem',
-              borderRadius: '1rem',
-              border: '2px solid rgba(59, 130, 246, 0.3)',
-              background: 'rgba(31, 41, 55, 0.8)',
-              color: '#60a5fa',
-              fontSize: '1rem',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              opacity: loading ? 0.5 : 1
-            }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)')}
-            onMouseLeave={(e) => !loading && (e.currentTarget.style.background = 'rgba(31, 41, 55, 0.8)')}
-          >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            {loading ? 'Actualizando...' : 'Actualizar'}
-          </button>
-
-          <button
-            onClick={handleExportPDF}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '1rem 2rem',
-              borderRadius: '1rem',
-              border: 'none',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              color: '#ffffff',
-              fontSize: '1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <Download className="w-5 h-5" />
-            Exportar PDF
-          </button>
         </div>
 
       </div>
